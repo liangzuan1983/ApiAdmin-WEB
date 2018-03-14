@@ -46,7 +46,7 @@
                                     <DropdownItem name="loginout" divided>退出登录</DropdownItem>
                                 </DropdownMenu>
                             </Dropdown>
-                            <Avatar :src="avatorPath" style="background: #619fe7;margin-left: 10px;"></Avatar>
+                            <Avatar :src="headImgPath" style="background: #619fe7;margin-left: 10px;"></Avatar>
                         </Row>
                     </div>
                 </div>
@@ -70,8 +70,9 @@
     import breadcrumbNav from './main_components/breadcrumb-nav.vue';
     import fullScreen from './main_components/fullscreen.vue';
     import lockScreen from './main_components/lock_screen/lockscreen.vue';
-    import themeSwitch from './main_components/theme-switch/theme-switch.vue';
+    import themeSwitch from './main_components/theme_switch/theme_switch.vue';
     import util from '@/libs/util.js';
+    import axios from 'axios';
 
     export default {
         components: {
@@ -100,8 +101,8 @@
             currentPath () {
                 return this.$store.state.app.currentPath; // 当前面包屑数组
             },
-            avatorPath () {
-                return localStorage.avatorImgPath;
+            headImgPath () {
+                return sessionStorage.headImg ? sessionStorage.headImg : require('../images/defaultImg.jpg');
             },
             cachePage () {
                 return this.$store.state.app.cachePage;
@@ -116,11 +117,11 @@
         methods: {
             init () {
                 let pathArr = util.setCurrentPath(this, this.$route.name);
-                this.$store.commit('updateMenulist');
+                this.$store.commit('updateMenuList');
                 if (pathArr.length >= 2) {
                     this.$store.commit('addOpenSubmenu', pathArr[1].name);
                 }
-                this.userName = localStorage.getItem('user');
+                this.userName = sessionStorage.getItem('user');
                 this.checkTag(this.$route.name);
             },
             toggleClick () {
@@ -128,16 +129,24 @@
             },
             handleClickUserDropdown (name) {
                 if (name === 'ownSpace') {
-                    util.openNewPage(this, 'ownspace_index');
+                    util.openNewPage(this, 'own_index');
                     this.$router.push({
-                        name: 'ownspace_index'
+                        name: 'own_index'
                     });
                 } else if (name === 'loginout') {
                     // 退出登录
-                    this.$store.commit('logout', this);
-                    this.$store.commit('clearOpenedSubmenu');
-                    this.$router.push({
-                        name: 'login'
+                    let vm = this;
+                    axios.get('Login/logout').then(function (response) {
+                        let res = response.data;
+                        if (res.code === 1) {
+                            vm.$store.commit('logout', vm);
+                            vm.$store.commit('clearOpenedSubmenu');
+                            vm.$router.push({
+                                name: 'login'
+                            });
+                        } else {
+                            vm.$Message.error(res.msg);
+                        }
                     });
                 }
             },

@@ -5,8 +5,8 @@
 <template>
     <transition name="show-unlock">
         <div class="unlock-body-con" v-if="showUnlock" @keydown.enter="handleUnlock">
-            <div @click="handleClickAvator" class="unlock-avator-con" :style="{marginLeft: avatorLeft}">
-                <img class="unlock-avator-img" :src="avatorPath">
+            <div @click="handleClickHeadImg" class="unlock-avator-con" :style="{marginLeft: avatorLeft}">
+                <img class="unlock-avator-img" :src="headImgPath">
                 <div  class="unlock-avator-cover">
                     <span><Icon type="unlocked" :size="30"></Icon></span>
                     <p>解锁</p>
@@ -27,7 +27,6 @@
 </template>
 
 <script>
-import Cookies from 'js-cookie';
 import axios from 'axios';
 export default {
     name: 'Unlock',
@@ -45,12 +44,12 @@ export default {
         }
     },
     computed: {
-        avatorPath () {
-            return localStorage.avatorImgPath;
+        headImgPath () {
+            return sessionStorage.headImg;
         }
     },
     methods: {
-        handleClickAvator () {
+        handleClickHeadImg () {
             this.avatorLeft = '-180px';
             this.inputLeft = '0px';
             this.$refs.inputEle.focus();
@@ -58,13 +57,13 @@ export default {
         handleUnlock () {
             let vObj = this;
             axios.post('Login/index', {
-                username: localStorage.getItem('user'),
+                username: sessionStorage.getItem('user'),
                 password: vObj.password
             }).then(function (response) {
                 if (response.data.code === 1) {
                     vObj.avatorLeft = '0px';
                     vObj.inputLeft = '400px';
-                    Cookies.set('locking', '0');
+                    sessionStorage.setItem('locking', '0');
                     vObj.$emit('on-unlock');
                     vObj.$store.commit('setUserToken', response.data.data.userToken);
                 } else {

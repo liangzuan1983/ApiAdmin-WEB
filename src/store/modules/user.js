@@ -1,22 +1,7 @@
-import Cookies from 'js-cookie';
-
 const user = {
-    state: {
-        userToken: ''
-    },
-    getters: {
-        userToken: (state) => {
-            return state.userToken || localStorage.getItem('userToken');
-        }
-    },
     mutations: {
-        setUserToken (state, token) {
-            state.userToken = token;
-            localStorage.setItem('userToken', token);
-        },
-        logout (state, vm) {
-            Cookies.remove('access');
-            state.userToken = '';
+        logout () {
+            sessionStorage.clear();
             // 恢复默认样式
             let themeLink = document.querySelector('link[name="theme"]');
             themeLink.setAttribute('href', '');
@@ -29,6 +14,13 @@ const user = {
             if (theme) {
                 localStorage.theme = theme;
             }
+        },
+        login (state, data) {
+            sessionStorage.setItem('access', data.access);
+            sessionStorage.setItem('user', data.nickname);
+            sessionStorage.setItem('headImg', data.headImg);
+            sessionStorage.setItem('apiAuth', data.apiAuth);
+            sessionStorage.setItem('userInfo', JSON.stringify(data));
         }
     }
 };

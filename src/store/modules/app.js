@@ -1,6 +1,5 @@
 import {otherRouter, appRouter} from '@/router/router';
 import Util from '@/libs/util';
-import Cookies from 'js-cookie';
 import Vue from 'vue';
 
 const app = {
@@ -37,8 +36,8 @@ const app = {
         setTagsList (state, list) {
             state.tagsList.push(...list);
         },
-        updateMenulist (state) {
-            let accessCode = parseInt(Cookies.get('access'));
+        updateMenuList (state) {
+            let accessCode = sessionStorage.getItem('access') ? sessionStorage.getItem('access').split(',') : '';
             let menuList = [];
             appRouter.forEach((item, index) => {
                 if (item.access !== undefined) {
@@ -113,7 +112,7 @@ const app = {
                 }
             });
         },
-        initCachepage (state) {
+        initCachePage (state) {
             if (localStorage.cachePage) {
                 state.cachePage = JSON.parse(localStorage.cachePage);
             }
@@ -169,9 +168,6 @@ const app = {
         },
         setCurrentPageName (state, name) {
             state.currentPageName = name;
-        },
-        setAvator (state, path) {
-            localStorage.avatorImgPath = path;
         },
         switchLang (state, lang) {
             state.lang = lang;
