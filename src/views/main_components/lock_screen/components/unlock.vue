@@ -45,7 +45,7 @@ export default {
     },
     computed: {
         headImgPath () {
-            return sessionStorage.headImg;
+            return sessionStorage.headImg ? sessionStorage.headImg : require('../../../../images/defaultImg.jpg');
         }
     },
     methods: {
@@ -56,8 +56,9 @@ export default {
         },
         handleUnlock () {
             let vObj = this;
+            let userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
             axios.post('Login/index', {
-                username: sessionStorage.getItem('user'),
+                username: userInfo.username,
                 password: vObj.password
             }).then(function (response) {
                 if (response.data.code === 1) {
